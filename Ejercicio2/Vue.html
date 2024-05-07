@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3.js Visualizations - Flare</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Add any custom CSS styles here */
+        body {
+            background-color: #8b8b8b;
+            /* Dark grey background */
+            margin: 0;
+            padding: 0;
+        }
+
+        .visualization {
+            width: 50vw;
+            height: 50vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            float: left;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="visualization" id="treemap"></div>
+    <div class="visualization" id="radial"></div>
+    <div class="visualization" id="partition"></div>
+    <div class="visualization" id="circle-packing"></div>
+    <div class="visualization" id="sunburst"></div>
+
+    <script>
+        // Manually defined data with new values
+        const data = [
+            { "pathname": "VUE", "size": 43042112 },
+            { "pathname": "VUE.@babel", "size": 1888798 },
+            { "pathname": "VUE.@babel.parser", "size": 1888696 },
+            { "pathname": "VUE.@babel.parser.CHANGELOG.md", "size": 38238 },
+            { "pathname": "VUE.@babel.parser.LICENSE", "size": 1086 },
+            { "pathname": "VUE.@babel.parser.README.md", "size": 427 },
+            { "pathname": "VUE.@babel.parser.bin", "size": 430 },
+            { "pathname": "VUE.@babel.parser.bin.babel-parser.js", "size": 328 },
+            { "pathname": "VUE.@babel.parser.lib", "size": 1840911 },
+            { "pathname": "VUE.@babel.parser.lib.index.js", "size": 469611 },
+            { "pathname": "VUE.@babel.parser.lib.index.js.map", "size": 1371164 },
+            { "pathname": "VUE.@babel.parser.package.json", "size": 1096 },
+            { "pathname": "VUE.@babel.parser.typings", "size": 6202 },
+            { "pathname": "VUE.@babel.parser.typings.babel-parser.d.ts", "size": 6100 },
+            { "pathname": "VUE.@vitejs", "size": 178821 },
+            { "pathname": "VUE.@vitejs.plugin-vue", "size": 178719 },
+            { "pathname": "VUE.@vitejs.plugin-vue.LICENSE", "size": 1098 },
+            { "pathname": "VUE.@vitejs.plugin-vue.README.md", "size": 3916 },
+            { "pathname": "VUE.@vitejs.plugin-vue.dist", "size": 171811 },
+            { "pathname": "VUE.@vitejs.plugin-vue.dist.index.d.ts", "size": 2359 },
+            { "pathname": "VUE.@vitejs.plugin-vue.dist.index.js", "size": 169316 },
+            { "pathname": "VUE.@vitejs.plugin-vue.package.json", "size": 1690 },
+            { "pathname": "VUE.@vue", "size": 6191191 },
+            { "pathname": "VUE.@vue.compiler-core", "size": 693228 },
+            { "pathname": "VUE.@vue.compiler-core.LICENSE", "size": 1091 },
+            { "pathname": "VUE.@vue.compiler-core.README.md", "size": 21 },
+            { "pathname": "VUE.@vue.compiler-core.dist", "size": 690737 },
+            { "pathname": "VUE.@vue.compiler-core.dist.compiler-core.cjs.js", "size": 229320 },
+            { "pathname": "VUE.@vue.compiler-core.dist.compiler-core.cjs.prod.js", "size": 222231 },
+            { "pathname": "VUE.@vue.compiler-core.dist.compiler-core.d.ts", "size": 43752 },
+            { "pathname": "VUE.@vue.compiler-core.dist.compiler-core.esm-bundler.js", "size": 195230 },
+            { "pathname": "VUE.@vue.compiler-core.index.js", "size": 191 },
+            { "pathname": "VUE.@vue.compiler-core.package.json", "size": 950 },
+            { "pathname": "VUE.@vue.compiler-dom", "size": 735839 },
+            { "pathname": "VUE.@vue.compiler-dom.LICENSE", "size": 1091 },
+            { "pathname": "VUE.@vue.compiler-dom.README.md", "size": 19 },
+            { "pathname": "VUE.@vue.compiler-dom.dist", "size": 733324 },
+            { "pathname": "VUE.@vue.compiler-dom.dist.compiler-dom.cjs.js", "size": 76849 },
+            { "pathname": "VUE.@vue.compiler-dom.dist.compiler-dom.cjs.prod.js", "size": 74981 },
+            { "pathname": "VUE.@vue.compiler-dom.dist.compiler-dom.d.ts", "size": 2147 },
+            { "pathname": "VUE.@vue.compiler-dom.dist.compiler-dom.esm-browser.js", "size": 216060 },
+            { "pathname": "VUE.@vue.compiler-dom.dist.compiler-dom.esm-browser.prod.js", "size": 56402 },
+            { "pathname": "VUE.@vue.compiler-dom.dist.compiler-dom.esm-bundler.js", "size": 19313 },
+            { "pathname": "VUE.@vue.compiler-dom.dist.compiler-dom.global.js", "size": 231014 },
+            { "pathname": "VUE.@vue.compiler-dom.dist.compiler-dom.global.prod.js", "size": 56218 },
+            { "pathname": "VUE.@vue.compiler-dom.index.js", "size": 189 },
+            { "pathname": "VUE.@vue.compiler-dom.package.json", "size": 978 },
+            { "pathname": "VUE.@vue.compiler-sfc", "size": 2044482 },
+            { "pathname": "VUE.@vue.compiler-sfc.LICENSE", "size": 1091 },
+            { "pathname": "VUE.@vue.compiler-sfc.README.md", "size": 4434 },
+            { "pathname": "VUE.@vue.compiler-sfc.dist", "size": 2037261 },
+            { "pathname": "VUE.@vue.compiler-sfc.dist.compiler-sfc.cjs.js", "size": 504725 },
+            { "pathname": "VUE.@vue.compiler-sfc.dist.compiler-sfc.d.ts", "size": 10104 },
+            { "pathname": "VUE.@vue.compiler-sfc.dist.compiler-sfc.esm-browser.js", "size": 1522262 },
+            { "pathname": "VUE.@vue.compiler-sfc.dist.compiler-sfc.esm-browser.prod.js", "size": 559081 },
+            { "pathname": "VUE.@vue.compiler-sfc.dist.compiler-sfc.esm-bundler.js", "size": 125158 },
+            { "pathname": "VUE.@vue.compiler-sfc.index.js", "size": 188 },
+            { "pathname": "VUE.@vue.compiler-sfc.package.json", "size": 1081 },
+            { "pathname": "VUE.@vue.composition-api", "size": 750372 },
+            { "pathname": "VUE.@vue.composition-api.LICENSE", "size": 1091 },
+            { "pathname": "VUE.@vue.composition-api.README.md", "size": 19 },
+            { "pathname": "VUE.@vue.composition-api.dist", "size": 748667 },
+            { "pathname": "VUE.@vue.composition-api.dist.composition-api.cjs.js", "size": 198754 },
+            { "pathname": "VUE.@vue.composition-api.dist.composition-api.d.ts", "size": 15121 },
+            { "pathname": "VUE.@vue.composition-api.dist.composition-api.esm-browser.js", "size": 149110 },
+            { "pathname": "VUE.@vue.composition-api.dist.composition-api.esm-browser.prod.js", "size": 37719 },
+            { "pathname": "VUE.@vue.composition-api.dist.composition-api.esm-bundler.js", "size": 13485 },
+            { "pathname": "VUE.@vue.composition-api.index.js", "size": 186 },
+            { "pathname": "VUE.@vue.composition-api.package.json", "size": 960 },
+            { "pathname": "VUE.@vue.effect", "size": 23392 },
+            { "pathname": "VUE.@vue.effect.LICENSE", "size": 1091 },
+            { "pathname": "VUE.@vue.effect.README.md", "size": 63 },
+            { "pathname": "VUE.@vue.effect.dist", "size": 22302 },
+            { "pathname": "VUE.@vue.effect.dist.effect.cjs.js", "size": 6717 },
+            { "pathname": "VUE.@vue.effect.dist.effect.esm-browser.js", "size": 8187 },
+            { "pathname": "VUE.@vue.effect.dist.effect.esm-bundler.js", "size": 7157 },
+            { "pathname": "VUE.@vue.effect.index.js", "size": 186 },
+            { "pathname": "VUE.@vue.effect.package.json", "size": 938 },
+            { "pathname": "VUE.@vue.reactivity", "size": 568610 },
+            { "pathname": "VUE.@vue.reactivity.LICENSE", "size": 1091 },
+            { "pathname": "VUE.@vue.reactivity.README.md", "size": 25 },
+            { "pathname": "VUE.@vue.reactivity.dist", "size": 567354 },
+            { "pathname": "VUE.@vue.reactivity.dist.reactivity.cjs.js", "size": 115838 },
+            { "pathname": "VUE.@vue.reactivity.dist.reactivity.esm-browser.js", "size": 104613 },
+            { "pathname": "VUE.@vue.reactivity.dist.reactivity.esm-bundler.js", "size": 107310 },
+            { "pathname": "VUE.@vue.reactivity.index.js", "size": 185 },
+            { "pathname": "VUE.@vue.reactivity.package.json", "size": 951 }
+        ];
+
+        const width = window.innerWidth * 0.5; // Adjust the width as needed
+        const height = window.innerHeight * 0.5; // Adjust the height as needed
+        const radius = Math.min(width, height) / 2;
+
+        const colorScaleTreemap = d3.scaleSequential(d3.interpolateTurbo).domain([0, d3.max(data, d => d.size)]);
+        const colorScaleCircle = d3.scaleSequential(d3.interpolateTurbo).domain([0, d3.max(data, d => d.size)]);
+        const colorScaleRadial = d3.scaleSequential(d3.interpolateTurbo).domain([0, d3.max(data, d => d.size)]);
+        const colorScalePartition = d3.scaleSequential(d3.interpolateTurbo).domain([0, d3.max(data, d => d.size)]);
+        const colorScaleSunburst = d3.scaleSequential(d3.interpolateTurbo).domain([0, d3.max(data, d => d.size)]);
+
+        const svgTreemap = d3.select("#treemap").append("svg").attr("viewBox", [0, 0, width, height]);
+        const svgCirclePacking = d3.select("#circle-packing").append("svg").attr("viewBox", [0, 0, width, height]);
+        const svgRadial = d3.select("#radial").append("svg").attr("viewBox", [-width / 2, -height / 2, width, height]);
+        const svgPartition = d3.select("#partition").append("svg").attr("viewBox", [-width / 2, -height / 2, width, height]);
+        const svgSunburst = d3.select("#sunburst").append("svg").attr("viewBox", [-width / 2, -height / 2, width, height]);
+
+        const treemapData = { name: "flare.analytics.cluster", children: data };
+        const circleData = { name: "flare.analytics.cluster", children: data };
+        const radialData = { name: "flare.analytics.cluster", children: data };
+        const partitionData = { name: "flare.analytics.cluster", children: data };
+        const sunburstData = { name: "flare.analytics.cluster", children: data };
+
+        const treemapLayout = d3.treemap().size([width, height]).padding(1).round(true);
+        const circleLayout = d3.pack().size([width, height]).padding(3);
+        const radialLayout = d3.cluster().size([2 * Math.PI, radius]);
+        const partitionLayout = d3.partition().size([2 * Math.PI, radius]);
+        const sunburstLayout = d3.partition().size([2 * Math.PI, radius]);
+
+        const treemapRoot = d3.hierarchy(treemapData).sum(d => d.size);
+        const circleRoot = d3.hierarchy(circleData).sum(d => d.size);
+        const radialRoot = d3.hierarchy(radialData);
+        const partitionRoot = d3.hierarchy(partitionData).sum(d => d.size);
+        const sunburstRoot = d3.hierarchy(sunburstData).sum(d => d.size);
+
+        treemapLayout(treemapRoot);
+        circleLayout(circleRoot);
+        radialLayout(radialRoot);
+        partitionLayout(partitionRoot);
+        sunburstLayout(sunburstRoot);
+
+        svgTreemap.selectAll("rect")
+            .data(treemapRoot.descendants())
+            .enter()
+            .append("rect")
+            .attr("x", d => d.x0)
+            .attr("y", d => d.y0)
+            .attr("width", d => d.x1 - d.x0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("fill", d => colorScaleTreemap(d.data.size))
+            .attr("stroke", "white");
+
+        svgCirclePacking.selectAll("circle")
+            .data(circleRoot.descendants())
+            .enter()
+            .append("circle")
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y)
+            .attr("r", d => d.r)
+            .attr("fill", d => colorScaleCircle(d.data.size))
+            .attr("stroke", "white");
+
+        svgRadial.selectAll("path")
+            .data(radialRoot.links())
+            .enter()
+            .append("path")
+            .attr("d", d3.linkRadial()
+                .angle(d => d.x)
+                .radius(d => d.y))
+            .attr("fill", "none")
+            .attr("stroke", d => colorScaleRadial(d.target.data.size));
+
+        svgRadial.selectAll("circle")
+            .data(radialRoot.descendants())
+            .enter()
+            .append("circle")
+            .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
+            .attr("r", 5)
+            .attr("fill", d => colorScaleRadial(d.data.size));
+
+        svgPartition.selectAll("path")
+            .data(partitionRoot.descendants())
+            .enter()
+            .append("path")
+            .attr("d", d3.arc()
+                .startAngle(d => d.x0)
+                .endAngle(d => d.x1)
+                .innerRadius(d => d.y0)
+                .outerRadius(d => d.y1))
+            .attr("fill", d => colorScalePartition(d.data.size))
+            .attr("stroke", "white");
+
+        svgSunburst.selectAll("path")
+            .data(sunburstRoot.descendants())
+            .enter()
+            .append("path")
+            .attr("d", d3.arc()
+                .startAngle(d => d.x0)
+                .endAngle(d => d.x1)
+                .innerRadius(d => d.y0)
+                .outerRadius(d => d.y1))
+            .attr("fill", d => colorScaleSunburst(d.data.size))
+            .attr("stroke", "white");
+    </script>
+</body>
+
+</html>
